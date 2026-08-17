@@ -659,16 +659,24 @@ def main():
         'min_samples': 100,
     }
     
-    # 数据目录（自动探测，适配任意上传方式）
+    # 数据目录（自动探测：先扫 /kaggle/input，再扫 /kaggle/working）
     data_root = None
-    for root, dirs, files in os.walk('/kaggle/input'):
-        if 'metadata.csv' in files:
-            data_root = root
+    for base in ['/kaggle/input', '/kaggle/working', '.']:
+        if not os.path.exists(base):
+            continue
+        for root, dirs, files in os.walk(base):
+            if 'metadata.csv' in files:
+                data_root = root
+                break
+        if data_root:
             break
-    
+
     if data_root is None:
-        print("错误：未找到 metadata.csv，请检查数据集是否上传成功")
-        print("/kaggle/input 下的目录结构：")
+        print("错误：未找到 metadata.csv")
+        print("请在 Notebook 里先执行以下命令下载数据集：")
+        print("  !wget -q https://nlp.stanford.edu/data/dro/waterbird_complete95_forest2water2.tar.gz")
+        print("  !tar -xzf waterbird_complete95_forest2water2.tar.gz")
+        print("\n当前 /kaggle/input 目录结构：")
         for root, dirs, files in os.walk('/kaggle/input'):
             print(f"  {root}: {dirs[:8]} {files[:8]}")
         return
