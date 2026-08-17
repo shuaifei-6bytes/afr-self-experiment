@@ -595,7 +595,7 @@ def evaluate_all(model, dataset, cfg, method_name):
         all_train_samples.extend(dataset['train_data'][c])
     
     train_metrics = evaluate_on_subset(model, all_train_samples, {'data_root': dataset['data_root'], 'batch_size': cfg['batch_size']})
-    train_d_prob = compute_d_prob_waterbirds(model, dataset, {'data_root': dataset['data_root'], 'batch_size': cfg['batch_size']})
+    train_d_prob = compute_d_prob_waterbirds(model, dataset, cfg)
     
     # 验证集评估
     val_metrics = evaluate_on_subset(model, dataset['val_data'], {'data_root': dataset['data_root'], 'batch_size': cfg['batch_size']})
