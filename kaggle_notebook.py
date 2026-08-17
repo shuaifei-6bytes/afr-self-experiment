@@ -659,13 +659,20 @@ def main():
         'min_samples': 100,
     }
     
-    # 数据目录（在 Kaggle 上需要先上传数据集）
-    data_root = '/kaggle/input/waterbirds-dataset/waterbird_complete95_forest2water2'
+    # 数据目录（自动探测，适配任意上传方式）
+    data_root = None
+    for root, dirs, files in os.walk('/kaggle/input'):
+        if 'metadata.csv' in files:
+            data_root = root
+            break
     
-    if not os.path.exists(data_root):
-        print(f"错误：数据集不存在：{data_root}")
-        print("请先上传 waterbird_complete95_forest2water2 数据集到 Kaggle Datasets")
+    if data_root is None:
+        print("错误：未找到 metadata.csv，请检查数据集是否上传成功")
+        print("/kaggle/input 下的目录结构：")
+        for root, dirs, files in os.walk('/kaggle/input'):
+            print(f"  {root}: {dirs[:8]} {files[:8]}")
         return
+    print(f"找到数据集: {data_root}")
     
     # Step 1: 构建数据集
     print("\n[Step 1] 构建数据集...")
