@@ -12,9 +12,6 @@
 # 预计运行时间：30-60 分钟（T4 GPU）
 # ============================================================
 
-# 安装依赖
-!pip install -q torch torchvision tqdm
-
 import os
 import copy
 import csv
