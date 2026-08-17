@@ -645,25 +645,6 @@ def main():
     print("AFR vs SELF 完整对比实验（Waterbirds 数据集）")
     print("=" * 60)
     
-    # 配置
-    cfg = {
-        'num_clients': 2,
-        'fed_rounds': 30,
-        'local_epochs': 1,
-        'batch_size': 32,
-        'fed_lr': 0.001,
-        'erm_lr': 0.001,
-        'erm_epochs': 15,
-        'early_stop_epochs': 5,
-        'head_retrain_lr': 0.001,
-        'head_retrain_epochs': 30,
-        'clip_low': 0.1,
-        'clip_high': 10.0,
-        'top_k_percent': 0.2,
-        'min_samples': 100,
-        'data_root': data_root,
-    }
-    
     # 数据目录（自动探测：先扫 /kaggle/input，再扫 /kaggle/working）
     data_root = None
     for base in ['/kaggle/input', '/kaggle/working', '.']:
@@ -686,6 +667,25 @@ def main():
             print(f"  {root}: {dirs[:8]} {files[:8]}")
         return
     print(f"找到数据集: {data_root}")
+    
+    # 配置
+    cfg = {
+        'num_clients': 2,
+        'fed_rounds': 30,
+        'local_epochs': 1,
+        'batch_size': 32,
+        'fed_lr': 0.001,
+        'erm_lr': 0.001,
+        'erm_epochs': 15,
+        'early_stop_epochs': 5,
+        'head_retrain_lr': 0.001,
+        'head_retrain_epochs': 30,
+        'clip_low': 0.1,
+        'clip_high': 10.0,
+        'top_k_percent': 0.2,
+        'min_samples': 100,
+        'data_root': data_root,
+    }
     
     # Step 1: 构建数据集
     print("\n[Step 1] 构建数据集...")
