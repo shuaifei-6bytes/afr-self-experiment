@@ -548,34 +548,34 @@ def compute_d_prob_waterbirds(model, dataset, cfg):
             # 水背景 (place=1): 水鸟概率
             water_bg_mask = places == 1
             if water_bg_mask.sum() > 0:
-                water_bg_probs = probs[water_bg_mask, 1].cpu()
+                water_bg_probs = probs[water_bg_mask, 1]
                 water_bg_labels = labels[water_bg_mask]
                 
                 # 多数群体：水背景 + 水鸟
                 majority_mask = water_bg_labels == 1
                 if majority_mask.sum() > 0:
-                    majority_probs.extend(water_bg_probs[majority_mask].numpy())
+                    majority_probs.extend(water_bg_probs[majority_mask].cpu().numpy())
                 
                 # 少数群体：水背景 + 陆鸟
                 minority_mask = water_bg_labels == 0
                 if minority_mask.sum() > 0:
-                    minority_probs.extend(water_bg_probs[minority_mask].numpy())
+                    minority_probs.extend(water_bg_probs[minority_mask].cpu().numpy())
             
             # 陆背景 (place=0): 陆鸟概率
             land_bg_mask = places == 0
             if land_bg_mask.sum() > 0:
-                land_bg_probs = probs[land_bg_mask, 0].cpu()
+                land_bg_probs = probs[land_bg_mask, 0]
                 land_bg_labels = labels[land_bg_mask]
                 
                 # 多数群体：陆背景 + 陆鸟
                 majority_mask = land_bg_labels == 0
                 if majority_mask.sum() > 0:
-                    majority_probs.extend(land_bg_probs[majority_mask].numpy())
+                    majority_probs.extend(land_bg_probs[majority_mask].cpu().numpy())
                 
                 # 少数群体：陆背景 + 水鸟
                 minority_mask = land_bg_labels == 1
                 if minority_mask.sum() > 0:
-                    minority_probs.extend(land_bg_probs[minority_mask].numpy())
+                    minority_probs.extend(land_bg_probs[minority_mask].cpu().numpy())
     
     majority_probs = np.array(majority_probs)
     minority_probs = np.array(minority_probs)
