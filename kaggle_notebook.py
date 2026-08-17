@@ -661,6 +661,7 @@ def main():
         'clip_high': 10.0,
         'top_k_percent': 0.2,
         'min_samples': 100,
+        'data_root': data_root,
     }
     
     # 数据目录（自动探测：先扫 /kaggle/input，再扫 /kaggle/working）
