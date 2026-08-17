@@ -493,7 +493,9 @@ def evaluate_on_subset(model, samples, cfg):
     
     with torch.no_grad():
         for images, labels, places, _ in loader:
-            images, labels = images.to(device), labels.to(device)
+            images = images.to(device)
+            labels = labels.to(device)
+            places = places.to(device)
             logits = model(images)
             preds = logits.argmax(dim=1)
             
@@ -538,6 +540,8 @@ def compute_d_prob_waterbirds(model, dataset, cfg):
     with torch.no_grad():
         for images, labels, places, _ in loader:
             images = images.to(device)
+            labels = labels.to(device)
+            places = places.to(device)
             logits = model(images)
             probs = F.softmax(logits, dim=1)
             
