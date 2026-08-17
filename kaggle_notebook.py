@@ -101,34 +101,42 @@ def _read_metadata(csv_path: str) -> List[Sample]:
 def _assign_clients(
     samples: List[Sample],
     num_clients: int = 2,
-    z0_prob: float = 0.8,
-    rho_list: List[float] = None
+    seed: int = 42
 ) -> Dict[int, List[Sample]]:
-    """按伪关联强度分配样本到客户端。"""
-    if rho_list is None:
-        rho_list = [0.9, 0.1]
+    """按伪关联强度分配样本到客户端。
+    
+    客户端 0: 主要包含多数群体样本（水背景+水鸟，陆背景+陆鸟）
+    客户端 1: 主要包含少数群体样本（水背景+陆鸟，陆背景+水鸟）
+    
+    这样模拟 non-IID 场景，但不让某个客户端样本量过少。
+    """
+    random.seed(seed)
     
     client_samples = {i: [] for i in range(num_clients)}
     
+    # 按群体分类
+    majority_samples = []  # 水背景+水鸟，陆背景+陆鸟
+    minority_samples = []  # 水背景+陆鸟，陆背景+水鸟
+    
     for s in samples:
-        if s.split != 0:  # 只要训练集
+        if s.split != 0:
             continue
         
-        # z=0: 多数群体（水背景→水鸟，陆背景→陆鸟）
         is_majority = (s.place == 1 and s.y == 1) or (s.place == 0 and s.y == 0)
-        z = 0 if is_majority else 1
-        
-        # 分配到客户端
-        if random.random() < z0_prob:
-            # 按 z 分配
-            client_id = 0 if z == 0 else 1
+        if is_majority:
+            majority_samples.append(s)
         else:
-            # 随机分配
-            client_id = random.randint(0, num_clients - 1)
-        
-        # 伪关联强度调整
-        if random.random() < rho_list[client_id]:
-            client_samples[client_id].append(s)
+            minority_samples.append(s)
+    
+    # 客户端 0: 80% 多数群体 + 20% 少数群体
+    random.shuffle(majority_samples)
+    random.shuffle(minority_samples)
+    
+    split_point_majority = int(len(majority_samples) * 0.8)
+    split_point_minority = int(len(minority_samples) * 0.2)
+    
+    client_samples[0] = majority_samples[:split_point_majority] + minority_samples[:split_point_minority]
+    client_samples[1] = majority_samples[split_point_majority:] + minority_samples[split_point_minority:]
     
     return client_samples
 
@@ -742,8 +750,19 @@ def main():
     # 保存结果
     import json
     output_path = '/kaggle/working/comparison_results.json'
+    # 转换 numpy float 为 Python float
+    results_serializable = []
+    for r in results:
+        r_copy = r.copy()
+        for k, v in r_copy.items():
+            if isinstance(v, np.floating):
+                r_copy[k] = float(v)
+            elif isinstance(v, np.integer):
+                r_copy[k] = int(v)
+        results_serializable.append(r_copy)
+    
     with open(output_path, 'w') as f:
-        json.dump(results, f, indent=2)
+        json.dump(results_serializable, f, indent=2)
     print(f"\n结果已保存到: {output_path}")
     
     return results
